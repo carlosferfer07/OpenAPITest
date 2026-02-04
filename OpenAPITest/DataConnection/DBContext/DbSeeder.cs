@@ -8,24 +8,22 @@ public static class DbSeeder
     {
         if (await db.Employees.AnyAsync()) return;
 
-        // Authors listed on Moonshot Partners "Authors" page (used here as sample employees).
-        // Source: https://www.moonshot.partners/author :contentReference[oaicite:2]{index=2}
         var seedPeople = new[]
         {
-            new { FullName = "David Gomez", Role = "Product Designer" },
-            new { FullName = "Francisco Hernández", Role = "Chief Operating Officer" },
-            new { FullName = "Jessica Leon", Role = "People & Operations Manager" },
-            new { FullName = "Juan Lagrange", Role = "Co-Founder" },
-            new { FullName = "Katherinne Jara Cáceres", Role = "UI Senior Designer and Branding" },
-            new { FullName = "Leonardo Cabeza", Role = "Senior Software Engineer" },
+            new { FullName = "David", Role = "Product Designer" },
+            new { FullName = "Francisco", Role = "Chief Operating Officer" },
+            new { FullName = "Jessica", Role = "People & Operations Manager" },
+            new { FullName = "Juan", Role = "Co-Founder" },
+            new { FullName = "Katherinne", Role = "UI Senior Designer and Branding" },
+            new { FullName = "Leonardo", Role = "Senior Software Engineer" },
             new { FullName = "Moonshot Editorial Team", Role = "Editorial" },
             new { FullName = "Moonshot-Girls", Role = "Women in Tech Group" },
-            new { FullName = "Pedro Mejía", Role = "Head of Sales & Growth" },
-            new { FullName = "Ricardo Rodriguez", Role = "Co-Founder at Moonshot Partners" },
-            new { FullName = "Rubens Pasquale", Role = "Chief Executive Officer" },
-            new { FullName = "Sasha Briceño", Role = "Content Creator and Co-Founder of Noodlesoup Studio" },
-            new { FullName = "Valentina Delfino", Role = "Project Manager" },
-            new { FullName = "Veronica Delfino", Role = "Project Manager & SEO Strategist" }
+            new { FullName = "Pedro", Role = "Head of Sales & Growth" },
+            new { FullName = "Ricardo", Role = "Co-Founder at Moonshot Partners" },
+            new { FullName = "Rubens", Role = "Chief Executive Officer" },
+            new { FullName = "Sasha", Role = "Content Creator and Co-Founder of Noodlesoup Studio" },
+            new { FullName = "Valentina", Role = "Project Manager" },
+            new { FullName = "Veronica", Role = "Project Manager & SEO Strategist" }
         };
 
         static (string first, string last) SplitName(string fullName)
