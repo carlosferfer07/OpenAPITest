@@ -4,10 +4,11 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { LoadingService } from './shared/services/loading-service';
 import { CommonModule } from '@angular/common';
 import { Toolbar } from './core/components/toolbar/toolbar';
+import { Footer } from "./core/components/footer/footer";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatProgressSpinner, CommonModule, Toolbar],
+  imports: [RouterOutlet, MatProgressSpinner, CommonModule, Toolbar, Footer],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

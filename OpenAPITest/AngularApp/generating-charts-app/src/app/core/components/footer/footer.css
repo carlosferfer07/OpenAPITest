@@ -1,0 +1,30 @@
+.cff {
+     background-image: url(../../../../../public/CFF.png);
+     background-repeat: no-repeat;
+     width: 67px;
+     height: 60px;
+     background-size: 67px 60px;
+}
+
+
+.footer-section {
+     color: #002447;   
+     text-align: center;
+     background-color: #edf7fe;
+     background-repeat: no-repeat;
+     background-position-x: center;
+     background-position-y: center;
+     width: 100%;
+     background-size: cover;
+}
+
+.footer-section-text {
+     padding: 5px;
+     display: inline-grid;
+}
+
+.footer-section-text p {
+     display: flex;
+     align-items: center;
+     margin: 0;
+}
