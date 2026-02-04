@@ -1,0 +1,25 @@
+<div class="chat-wrapper">
+  <h1 class="mat-display-1 chat-title">This is the <img class="invert-moonshot-color" src="MoonshotLogo.svg" alt="Moonshot"> employees chart generator.</h1>
+  <h2 class="mat-display-1 chat-title">What data would you like to see as a chart? (e.g. overtime by month, hours by employee, absences by week, salary details)?</h2>
+
+  <form class="chat-form">
+    <mat-form-field appearance="outline" class="chat-input-field">
+      <mat-label>Message the employee chart generator</mat-label>
+      <input matInput placeholder="Ask anything..." [(ngModel)]="prompt" name="prompt" />
+      <button mat-icon-button matSuffix aria-label="Send" (click)="run()">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+    </mat-form-field>
+  </form>
+
+  <p *ngIf="error" class="chat-error">{{ error }}</p>
+
+    <div *ngIf="chartData">
+      <h3 style="margin: 8px 0;">{{ title }}</h3>
+      <canvas baseChart
+        [type]="chartType"
+        [data]="chartData"
+        [options]="chartOptions">
+      </canvas>
+    </div>
+</div>

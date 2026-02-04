@@ -1,0 +1,11 @@
+<app-toolbar></app-toolbar>
+
+<main class="main">  
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+<div class="global-loading" *ngIf="loading$ | async">
+  <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+</div>
