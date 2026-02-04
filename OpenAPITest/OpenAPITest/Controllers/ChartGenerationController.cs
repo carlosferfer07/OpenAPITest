@@ -29,7 +29,7 @@ namespace OpenAPITest.Controllers
                         
             if (plan == null)
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate chart plan.");
-
+                        
             return plan.Dataset switch
             {
                 "overtime_by_month" => Ok(await _chartBuildService.BuildOvertimeByMonth(plan)),

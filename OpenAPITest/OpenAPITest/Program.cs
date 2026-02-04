@@ -15,10 +15,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton(openAiOpts);
+
 // Register Business Services with HttpClient support
 builder.Services.AddHttpClient<IChartAiService, ChartAiService>();
-builder.Services.AddHttpClient<IChartDataService, ChartDataService>();
-builder.Services.AddHttpClient<IChartBuildService, ChartBuilderService>();
+
+// Register Business Services without HttpClient support (for dependency injection)
+builder.Services.AddTransient<IChartDataService, ChartDataService>();
+builder.Services.AddTransient<IChartBuildService, ChartBuilderService>();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseInMemoryDatabase("AiChartsDb")); 
