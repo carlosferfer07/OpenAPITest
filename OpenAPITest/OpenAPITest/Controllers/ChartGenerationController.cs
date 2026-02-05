@@ -19,6 +19,12 @@ namespace OpenAPITest.Controllers
             _chartBuildService = chartBuildService;
         }
 
+        /// <summary>
+        /// Generates a chart specification based on a natural language prompt and builds the corresponding chart data.
+        /// </summary>
+        /// <param name="req">User data request</param>
+        /// <param name="ct">cancellation token</param>
+        /// <returns></returns>
         [HttpPost("generate-from-prompt")]
         public async Task<ActionResult<ChartSpec>> GenerateFromPrompt([FromBody] ChartRequest req, CancellationToken ct)
         {
