@@ -28,8 +28,7 @@ namespace BusinessService.Services
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public async Task<ChartSpec> CreatePlanAsync(string prompt, CancellationToken ct = default)
-        {
-            // Responses API (recommended for new projects) :contentReference[oaicite:2]{index=2}
+        {            
             var requestBody = new
             {
                 model = _opts.Model,
