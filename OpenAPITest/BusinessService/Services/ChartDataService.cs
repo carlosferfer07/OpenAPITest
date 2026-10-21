@@ -12,10 +12,13 @@ namespace BusinessService.Services
 
         public ChartDataService(AppDbContext db) => _db = db;
 
-        public async Task<IReadOnlyList<MonthValue>> GetOvertimeByMonthAsync(int year)
+        public async Task<IReadOnlyList<MonthValue>> GetOvertimeByMonthAsync(int year, int? employeeId = null)
         {
-            var rows = await _db.Overtimes
-                .Where(x => x.Date.Year == year)
+            var query = _db.Overtimes.Where(x => x.Date.Year == year);
+            if (employeeId is int id)
+                query = query.Where(x => x.EmployeeId == id);
+
+            var rows = await query
                 .GroupBy(x => new { x.Date.Year, x.Date.Month })
                 .Select(g => new
                 {
@@ -31,29 +34,41 @@ namespace BusinessService.Services
                 .ToList();
         }
 
-        public async Task<IReadOnlyList<NameValue>> GetTotalHoursByEmployeeAsync(DateTime from, DateTime to)
+        public async Task<IReadOnlyList<NameValue>> GetTotalHoursByEmployeeAsync(DateTime from, DateTime to, int? employeeId = null)
         {
-            var rows = await _db.WorkHours
-                .Where(x => x.Date >= from && x.Date <= to)
+            // "to" is meant as a whole day, so anything logged on that day still counts
+            var start = from.Date;
+            var endExclusive = to.Date.AddDays(1);
+
+            var query = _db.WorkHours.Where(x => x.Date >= start && x.Date < endExclusive);
+            if (employeeId is int id)
+                query = query.Where(x => x.EmployeeId == id);
+
+            var rows = await query
                 .Join(_db.Employees,
                     wh => wh.EmployeeId,
                     e => e.Id,
-                    (wh, e) => new { e.FirstName, e.LastName, wh.Hours })
-                .GroupBy(x => new { x.FirstName, x.LastName })
+                    (wh, e) => new { e.Id, e.FirstName, e.LastName, wh.Hours })
+                // Group by id so two people with the same name don't get merged together
+                .GroupBy(x => new { x.Id, x.FirstName, x.LastName })
                 .Select(g => new {
-                    Name = $"{g.Key.FirstName} {g.Key.LastName}",
+                    g.Key.FirstName,
+                    g.Key.LastName,
                     Value = g.Sum(x => x.Hours)
                 })
                 .OrderByDescending(x => x.Value)
                 .ToListAsync();
 
-            return rows.Select(x => new NameValue(x.Name, x.Value)).ToList();
+            return rows.Select(x => new NameValue($"{x.FirstName} {x.LastName}".Trim(), x.Value)).ToList();
         }
 
-        public async Task<IReadOnlyList<WeekValue>> GetAbsencesByWeekAsync(int year)
+        public async Task<IReadOnlyList<WeekValue>> GetAbsencesByWeekAsync(int year, int? employeeId = null)
         {
-            var rows = await _db.Absences
-                .Where(x => x.Year == year)
+            var query = _db.Absences.Where(x => x.Year == year);
+            if (employeeId is int id)
+                query = query.Where(x => x.EmployeeId == id);
+
+            var rows = await query
                 .GroupBy(x => new { x.Year, x.WeekNumber })
                 .Select(g => new
                 {
@@ -65,6 +80,11 @@ namespace BusinessService.Services
                 .ToListAsync();
 
             return rows.Select(x => new WeekValue(x.Year, x.WeekNumber, x.Value)).ToList();
+        }
+
+        public async Task<DateTime?> GetLatestRecordedDateAsync()
+        {
+            return await _db.WorkHours.MaxAsync(x => (DateTime?)x.Date);
         }
     }
 }

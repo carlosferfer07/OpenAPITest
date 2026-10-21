@@ -5,12 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ReportGenerator } from '../../services/report-generator';
-import { AiChartPlan } from '../../models/ai-chart-plan';
 import type { ChartConfiguration, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from '../../../shared/services/loading-service';
 import { finalize } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-the-chart-generator',
@@ -51,9 +51,18 @@ export class TheChartGenerator {
           this.chartType = chart.type;
           this.chartData = { labels: chart.labels, datasets: chart.datasets };
         },
-        error: (err) => {
-          this.error = err?.error?.message ?? err?.error ?? err?.message ?? 'Request failed';
+        error: (err: HttpErrorResponse) => {
+          this.error = this.describeError(err);
         }
       });
+  }
+
+  // The API sends plain text for bad requests and ProblemDetails JSON for everything else
+  private describeError(err: HttpErrorResponse): string {
+    const body = err.error;
+    if (typeof body === 'string' && body.trim()) {
+      return body;
+    }
+    return body?.detail ?? body?.title ?? err.message ?? 'Request failed';
   }
 }

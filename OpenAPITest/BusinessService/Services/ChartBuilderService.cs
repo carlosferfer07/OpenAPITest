@@ -8,65 +8,67 @@ namespace BusinessService.Services
         private readonly IChartDataService _chartData;
         public ChartBuilderService(IChartDataService chartDataService) => _chartData = chartDataService;
 
-        public async Task<object> BuildOvertimeByMonth(ChartSpec plan)
+        public async Task<ChartResponse> BuildOvertimeByMonth(ChartSpec plan)
         {
-            if (plan.Year is null)
-                throw new InvalidOperationException("Year is required.");
+            var year = plan.Year ?? await GetLatestYearAsync();
+            var data = await _chartData.GetOvertimeByMonthAsync(year, plan.EmployeeId);
 
-            var data = await _chartData.GetOvertimeByMonthAsync(plan.Year.Value);
+            return BuildResponse(plan, data.Select(x => x.Month), "Overtime hours", data.Select(x => x.Value));
+        }
 
-            return new
+        public async Task<ChartResponse> BuildHoursByEmployee(ChartSpec plan)
+        {
+            var (from, to) = await ResolveDateRangeAsync(plan);
+            var data = await _chartData.GetTotalHoursByEmployeeAsync(from, to, plan.EmployeeId);
+
+            return BuildResponse(plan, data.Select(x => x.Name), "Total hours", data.Select(x => x.Value));
+        }
+
+        public async Task<ChartResponse> BuildAbsencesByWeek(ChartSpec plan)
+        {
+            var year = plan.Year ?? await GetLatestYearAsync();
+            var data = await _chartData.GetAbsencesByWeekAsync(year, plan.EmployeeId);
+
+            return BuildResponse(plan, data.Select(x => $"W{x.WeekNumber}"), "Absent hours", data.Select(x => x.Value));
+        }
+
+        private static ChartResponse BuildResponse(ChartSpec plan, IEnumerable<string> labels, string datasetLabel, IEnumerable<decimal> values)
+        {
+            return new ChartResponse
             {
-                type = plan.ChartType,
-                title = plan.Title,
-                labels = data.Select(x => x.Month),
-                datasets = new[] { new {
-                    label = "Overtime hours",
-                    data = data.Select(x => x.Value)
-                    }
-                }
+                Type = plan.ChartType,
+                Title = plan.Title,
+                Labels = labels.ToList(),
+                Datasets = [new ChartDataset { Label = datasetLabel, Data = values.ToList() }]
             };
         }
 
-        public async Task<object> BuildHoursByEmployee(ChartSpec plan)
+        /// <summary>
+        /// When the user doesn't mention a year, show the most recent year we actually have data for
+        /// instead of failing (or showing an empty chart for the current year).
+        /// </summary>
+        private async Task<int> GetLatestYearAsync()
         {
-            var from = plan.From ?? DateTime.UtcNow.AddMonths(-1);
-            var to = plan.To ?? DateTime.UtcNow;
-
-            var data = await _chartData.GetTotalHoursByEmployeeAsync(from, to);
-
-            return new
-            {
-                type = plan.ChartType,
-                title = plan.Title,
-                labels = data.Select(x => x.Name),
-                datasets = new[] { new {
-                    label = "Total hours",
-                    data = data.Select(x => x.Value)
-                    }
-                }
-            };
+            var latest = await _chartData.GetLatestRecordedDateAsync();
+            return latest?.Year ?? DateTime.UtcNow.Year;
         }
 
-        public async Task<object> BuildAbsencesByWeek(ChartSpec plan)
+        /// <summary>
+        /// Works out which dates to use when the prompt was vague. If only a year was given we take the
+        /// whole year; otherwise we fall back to the last month that actually has data in it.
+        /// </summary>
+        private async Task<(DateTime from, DateTime to)> ResolveDateRangeAsync(ChartSpec plan)
         {
-            if (plan.Year is null)
-                throw new InvalidOperationException("Year is required.");
+            if (plan.From is null && plan.To is null && plan.Year is int year)
+                return (new DateTime(year, 1, 1), new DateTime(year, 12, 31));
 
-            var data = await _chartData.GetAbsencesByWeekAsync(plan.Year.Value);
+            var to = plan.To
+                ?? plan.From?.AddMonths(1)
+                ?? await _chartData.GetLatestRecordedDateAsync()
+                ?? DateTime.UtcNow;
+            var from = plan.From ?? to.AddMonths(-1);
 
-            return new
-            {
-                type = plan.ChartType,
-                title = plan.Title,
-                labels = data.Select(x => $"W{x.WeekNumber}"),
-                datasets = new[] { new {
-                    label = "Absent hours",
-                    data = data.Select(x => x.Value)
-                    }
-                }
-            };
+            return (from, to);
         }
-
     }
 }

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AiChartPlan } from '../models/ai-chart-plan';
+import { ChartResponse } from '../models/chart-response';
 import { Observable } from 'rxjs';
 import { AiChartRequest } from '../models/ai-chart-request';
 
@@ -12,8 +12,8 @@ export class ReportGenerator {
 
   constructor(private http: HttpClient) {}
 
-  generateFromPrompt(prompt: string): Observable<AiChartPlan> {
+  generateFromPrompt(prompt: string): Observable<ChartResponse> {
     const body: AiChartRequest = { prompt };
-    return this.http.post<AiChartPlan>(`${this.baseUrl}/generate-from-prompt`, body);
+    return this.http.post<ChartResponse>(`${this.baseUrl}/generate-from-prompt`, body);
   }
 }

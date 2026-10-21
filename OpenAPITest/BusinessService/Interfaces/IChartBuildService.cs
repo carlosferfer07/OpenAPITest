@@ -4,8 +4,8 @@ namespace BusinessService.Interfaces
 {
     public interface IChartBuildService
     {
-        Task<object> BuildOvertimeByMonth(ChartSpec plan);
-        Task<object> BuildHoursByEmployee(ChartSpec plan);
-        Task<object> BuildAbsencesByWeek(ChartSpec plan);
+        Task<ChartResponse> BuildOvertimeByMonth(ChartSpec plan);
+        Task<ChartResponse> BuildHoursByEmployee(ChartSpec plan);
+        Task<ChartResponse> BuildAbsencesByWeek(ChartSpec plan);
     }
 }

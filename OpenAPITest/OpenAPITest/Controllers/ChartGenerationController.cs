@@ -24,23 +24,20 @@ namespace OpenAPITest.Controllers
         /// </summary>
         /// <param name="req">User data request</param>
         /// <param name="ct">cancellation token</param>
-        /// <returns></returns>
+        /// <returns>The chart, ready to be rendered with Chart.js</returns>
         [HttpPost("generate-from-prompt")]
-        public async Task<ActionResult<ChartSpec>> GenerateFromPrompt([FromBody] ChartRequest req, CancellationToken ct)
+        public async Task<ActionResult<ChartResponse>> GenerateFromPrompt([FromBody] ChartRequest req, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(req.Prompt))
                 return BadRequest("Prompt is required.");
 
             var plan = await _ai.CreatePlanAsync(req.Prompt, ct);
-                        
-            if (plan == null)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate chart plan.");
-                        
+
             return plan.Dataset switch
             {
-                "overtime_by_month" => Ok(await _chartBuildService.BuildOvertimeByMonth(plan)),
-                "hours_by_employee" => Ok(await _chartBuildService.BuildHoursByEmployee(plan)),
-                "absences_by_week" => Ok(await _chartBuildService.BuildAbsencesByWeek(plan)),
+                "overtime_by_month" => await _chartBuildService.BuildOvertimeByMonth(plan),
+                "hours_by_employee" => await _chartBuildService.BuildHoursByEmployee(plan),
+                "absences_by_week" => await _chartBuildService.BuildAbsencesByWeek(plan),
 
                 _ => BadRequest($"Unsupported dataset: {plan.Dataset}")
             };

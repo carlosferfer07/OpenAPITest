@@ -1,6 +1,7 @@
 ﻿using BusinessService.Interfaces;
 using BusinessService.Models;
 using BusinessService.Models.Charts;
+using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -14,10 +15,10 @@ namespace BusinessService.Services
         private readonly HttpClient _http;
         private readonly OpenAiOptions _opts;
 
-        public ChartAiService(HttpClient http, OpenAiOptions opts)
+        public ChartAiService(HttpClient http, IOptions<OpenAiOptions> opts)
         {
             _http = http;
-            _opts = opts;
+            _opts = opts.Value;
         }
 
         /// <summary>
@@ -88,24 +89,18 @@ namespace BusinessService.Services
             if (!res.IsSuccessStatusCode)
                 throw new InvalidOperationException($"OpenAI error {(int)res.StatusCode}: {json}");
 
-            // Extract the model text output (which is JSON because we used json_schema) :contentReference[oaicite:3]{index=3}
+            // The model's text output is already JSON, since we asked for a json_schema response.
+            // The Web serializer defaults handle the camelCase -> PascalCase mapping for us.
             var planJson = ExtractFirstOutputText(json);
-            var plan = JsonSerializer.Deserialize<ChartSpec>(planJson, JsonOpts)
-                       ?? throw new InvalidOperationException("Failed to parse AiChartPlan.");
-
-            // Map JSON property names -> C# property names (dataset -> Dataset etc.)
-            plan = new ChartSpec
+            try
             {
-                Dataset = GetProp(planJson, "dataset") ?? plan.Dataset,
-                ChartType = GetProp(planJson, "chartType") ?? plan.ChartType,
-                Title = GetProp(planJson, "title") ?? plan.Title,
-                Year = TryGetInt(planJson, "year"),
-                EmployeeId = TryGetInt(planJson, "employeeId"),
-                From = TryGetDateTime(planJson, "from"),
-                To = TryGetDateTime(planJson, "to")
-            };
-
-            return plan;
+                return JsonSerializer.Deserialize<ChartSpec>(planJson, JsonOpts)
+                       ?? throw new InvalidOperationException("The AI returned an empty chart plan.");
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException("The AI returned a chart plan we couldn't read.", ex);
+            }
         }
 
         /// <summary>
@@ -142,46 +137,6 @@ namespace BusinessService.Services
             }
 
             throw new InvalidOperationException("Could not find output content text in response.");
-        }
-
-
-        /// <summary>
-        /// Tiny helpers to read values from the JSON text
-        /// </summary>
-        /// <param name="json"></param>
-        /// <param name="prop"></param>
-        /// <returns></returns>
-        private static string? GetProp(string json, string prop)
-        {
-            using var d = JsonDocument.Parse(json);
-            return d.RootElement.TryGetProperty(prop, out var v) ? v.GetString() : null;
-        }
-
-        /// <summary>
-        /// Converts a JSON property to int?
-        /// </summary>
-        /// <param name="json"></param>
-        /// <param name="prop"></param>
-        /// <returns></returns>
-        private static int? TryGetInt(string json, string prop)
-        {
-            using var d = JsonDocument.Parse(json);
-            if (!d.RootElement.TryGetProperty(prop, out var v) || v.ValueKind == JsonValueKind.Null) return null;
-            return v.GetInt32();
-        }
-
-        /// <summary>
-        /// converts a JSON property to DateTime?
-        /// </summary>
-        /// <param name="json"></param>
-        /// <param name="prop"></param>
-        /// <returns></returns>
-        private static DateTime? TryGetDateTime(string json, string prop)
-        {
-            using var d = JsonDocument.Parse(json);
-            if (!d.RootElement.TryGetProperty(prop, out var v) || v.ValueKind == JsonValueKind.Null) return null;
-            if (DateTime.TryParse(v.GetString(), out var dt)) return dt;
-            return null;
         }
     }
 }

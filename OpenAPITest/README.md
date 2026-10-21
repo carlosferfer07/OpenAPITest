@@ -29,7 +29,7 @@ AI is used only to interpret user intent, never to access or query the database 
 Flow:
 User enters a natural language prompt in the UI.
 Backend sends the prompt to OpenAI.
-OpenAI returns a strictly validated JSON plan (AiChartPlan).
+OpenAI returns a strictly validated JSON plan (ChartSpec).
 Backend maps the plan to predefined datasets.
 Entity Framework queries the data.
 API returns Chart.js-ready JSON to Angular.
@@ -48,7 +48,10 @@ Backend Setup
 Clone the repository
 Set your OpenAI API key:
 
-set OPENAI_API_KEY "sk-xxxx"
+cd OpenAPITest
+dotnet user-secrets set "OpenAI:ApiKey" "sk-xxxx"
+
+(or set the OpenAI__ApiKey environment variable). The API won't start without a key, so you'll know right away if it's missing.
 
 
 Run the API:
