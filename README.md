@@ -72,10 +72,12 @@ What this gives you:
 ## Solution structure
 
 ```
-OpenAPITest/       API layer: controllers, DI wiring, orchestration
-BusinessService/   AI intent handling (ChartAiService) and chart building (ChartBuilderService)
-DataConnection/    EF Core entities, DbContext, seed data
-AngularApp/        Frontend: prompt input, chart rendering, layout
+OpenAPITest/
+  OpenAPITest.sln
+  OpenAPITest/       API layer: controllers, DI wiring, orchestration
+  BusinessService/   AI intent handling (ChartAiService) and chart building (ChartBuilderService)
+  DataConnection/    EF Core entities, DbContext, seed data
+  AngularApp/        Frontend: prompt input, chart rendering, layout
 ```
 
 Each layer has one job. The API layer doesn't know about OpenAI, and the AI service doesn't know about EF.
@@ -97,7 +99,7 @@ Returns labels and datasets ready to pass straight into Chart.js. Full docs are 
 **Backend**
 
 ```bash
-cd OpenAPITest
+cd OpenAPITest/OpenAPITest
 dotnet user-secrets set "OpenAI:ApiKey" "sk-xxxx"   # or set OpenAI__ApiKey as an env var
 dotnet run
 ```
@@ -107,7 +109,7 @@ The API won't start without a key, so a missing one shows up right away.
 **Frontend**
 
 ```bash
-cd AngularApp/generating-charts-app
+cd OpenAPITest/AngularApp/generating-charts-app
 npm install
 npm start
 ```
