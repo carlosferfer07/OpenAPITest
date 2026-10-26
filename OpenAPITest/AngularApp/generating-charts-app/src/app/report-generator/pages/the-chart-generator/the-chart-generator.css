@@ -33,11 +33,6 @@
   padding: 8px 16px !important;
 }
 
-.invert-moonshot-color{
-   filter: invert(1); 
-   margin: -7px 10px 0px 10px;
-}
-
 .chat-error {
   color:#b00020; 
   margin-top:0;

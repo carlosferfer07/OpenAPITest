@@ -10,20 +10,20 @@ public static class DbSeeder
 
         var seedPeople = new[]
         {
-            new { FullName = "David", Role = "Product Designer" },
-            new { FullName = "Francisco", Role = "Chief Operating Officer" },
-            new { FullName = "Jessica", Role = "People & Operations Manager" },
-            new { FullName = "Juan", Role = "Co-Founder" },
-            new { FullName = "Katherinne", Role = "UI Senior Designer and Branding" },
-            new { FullName = "Leonardo", Role = "Senior Software Engineer" },
-            new { FullName = "Moonshot Editorial Team", Role = "Editorial" },
-            new { FullName = "Moonshot-Girls", Role = "Women in Tech Group" },
-            new { FullName = "Pedro", Role = "Head of Sales & Growth" },
-            new { FullName = "Ricardo", Role = "Co-Founder at Moonshot Partners" },
-            new { FullName = "Rubens", Role = "Chief Executive Officer" },
-            new { FullName = "Sasha", Role = "Content Creator and Co-Founder of Noodlesoup Studio" },
-            new { FullName = "Valentina", Role = "Project Manager" },
-            new { FullName = "Veronica", Role = "Project Manager & SEO Strategist" }
+            new { FullName = "Alex", Role = "Product Designer" },
+            new { FullName = "Ben", Role = "Chief Operating Officer" },
+            new { FullName = "Chloe", Role = "People & Operations Manager" },
+            new { FullName = "Daniel", Role = "Co-Founder" },
+            new { FullName = "Emma", Role = "Senior UI Designer" },
+            new { FullName = "Finn", Role = "Senior Software Engineer" },
+            new { FullName = "Grace", Role = "Editor" },
+            new { FullName = "Hannah", Role = "Software Engineer" },
+            new { FullName = "Isaac", Role = "Head of Sales & Growth" },
+            new { FullName = "Jack", Role = "Co-Founder" },
+            new { FullName = "Kate", Role = "Chief Executive Officer" },
+            new { FullName = "Liam", Role = "Content Creator" },
+            new { FullName = "Maya", Role = "Project Manager" },
+            new { FullName = "Noah", Role = "Project Manager & SEO Strategist" }
         };
 
         static (string first, string last) SplitName(string fullName)
@@ -63,7 +63,7 @@ public static class DbSeeder
                 return new Employee
                 {
                     Id = idx + 1,
-                    EmployeeNumber = $"MS{(idx + 1).ToString("D3")}-{p.Role.Replace(' ', '_')}",
+                    EmployeeNumber = $"EMP{(idx + 1).ToString("D3")}-{p.Role.Replace(' ', '_')}",
                     FirstName = first,
                     LastName = last,
                     Salary = SalaryFromRole(p.Role)
